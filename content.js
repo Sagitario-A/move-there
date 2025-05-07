@@ -1,8 +1,34 @@
 // Variables de control
 let isRunning = false;
 let intervalId = null;
+let currentDirection = null;
+let diagonalKeyIndex = 0; // Índice para alternar entre teclas en diagonales
 
-// Función para encontrar el canvas del juego
+// Direcciones de movimiento
+const DIRECTIONS = {
+  UP: 'up',
+  DOWN: 'down',
+  LEFT: 'left',
+  RIGHT: 'right',
+  UP_LEFT: 'upLeft',
+  UP_RIGHT: 'upRight',
+  DOWN_LEFT: 'downLeft',
+  DOWN_RIGHT: 'downRight'
+};
+
+// Mapeo de direcciones a teclas
+const DIRECTION_KEYS = {
+  [DIRECTIONS.UP]: ['ArrowUp'],
+  [DIRECTIONS.DOWN]: ['ArrowDown'],
+  [DIRECTIONS.LEFT]: ['ArrowLeft'],
+  [DIRECTIONS.RIGHT]: ['ArrowRight'],
+  [DIRECTIONS.UP_LEFT]: ['ArrowUp', 'ArrowLeft'],
+  [DIRECTIONS.UP_RIGHT]: ['ArrowUp', 'ArrowRight'],
+  [DIRECTIONS.DOWN_LEFT]: ['ArrowDown', 'ArrowLeft'],
+  [DIRECTIONS.DOWN_RIGHT]: ['ArrowDown', 'ArrowRight']
+};
+
+// Función para obtener el canvas del juego
 function getGameCanvas() {
   return document.querySelector('canvas');
 }
@@ -37,14 +63,68 @@ function pressKey(key, code) {
       cancelable: true,
       view: window
     }));
-  }, 30); // Reducido de 100ms a 30ms para mayor velocidad
+  }, 20); // Reducido para mayor velocidad
 }
 
-// Función para iniciar el bot
-function startBot() {
-  if (isRunning) return;
+// Función para determinar si una dirección es válida
+function isValidDirection(direction) {
+  return Object.values(DIRECTIONS).includes(direction);
+}
+
+// Función para mover en una dirección
+function moveInDirection(direction) {
+  if (!isValidDirection(direction)) {
+    console.error('NotHereBot: Dirección no válida:', direction);
+    return;
+  }
   
-  console.log('NotHereBot: Iniciando automovimiento rápido...');
+  // Obtener las teclas para esta dirección
+  const keys = DIRECTION_KEYS[direction];
+  
+  if (!keys || keys.length === 0) {
+    console.error('NotHereBot: No hay teclas definidas para la dirección:', direction);
+    return;
+  }
+  
+  const canvas = getGameCanvas();
+  if (!canvas) {
+    console.error('NotHereBot: No se encontró el canvas del juego');
+    return;
+  }
+  
+  // Para direcciones diagonales (que tienen dos teclas), alternar entre ambas muy rápidamente
+  if (keys.length > 1) {
+    // Usar el índice para alternar entre teclas
+    const currentKeyIndex = diagonalKeyIndex % keys.length;
+    const key = keys[currentKeyIndex];
+    
+    // Presionar la tecla actual
+    pressKey(key, key);
+    
+    // Incrementar el índice para la próxima iteración
+    diagonalKeyIndex++;
+  } else {
+    // Para direcciones simples, solo presionar la tecla
+    pressKey(keys[0], keys[0]);
+  }
+}
+
+// Función para iniciar el movimiento en una dirección específica
+function startDirectionalMovement(direction) {
+  stopBot(); // Detener cualquier movimiento anterior
+  
+  if (!direction || direction === 'stop') {
+    console.log('NotHereBot: Movimiento detenido');
+    return;
+  }
+  
+  // Verificar que la dirección sea válida
+  if (!isValidDirection(direction)) {
+    console.error('NotHereBot: Dirección no válida para movimiento:', direction);
+    return;
+  }
+  
+  console.log(`NotHereBot: Iniciando movimiento en dirección: ${direction}`);
   
   const canvas = getGameCanvas();
   if (!canvas) {
@@ -56,45 +136,26 @@ function startBot() {
   canvas.click();
   
   isRunning = true;
+  currentDirection = direction;
+  diagonalKeyIndex = 0;
   
-  // Movimiento en loop mucho más rápido
+  // Determinar el intervalo adecuado según el tipo de dirección
+  const keys = DIRECTION_KEYS[direction];
+  const intervalTime = (keys && keys.length > 1) ? 50 : 80; // Más rápido para diagonales
+  
+  // Mover continuamente en la dirección especificada
   intervalId = setInterval(() => {
-    // Secuencia rápida de movimientos
-    pressKey('ArrowUp', 'ArrowUp');
-    
-    // Movimientos adicionales con menos retraso
-    setTimeout(() => pressKey('ArrowRight', 'ArrowRight'), 50);
-    
-    // Alternancia entre varias teclas para máxima velocidad
-    setTimeout(() => pressKey('ArrowUp', 'ArrowUp'), 100);
-    setTimeout(() => pressKey('ArrowRight', 'ArrowRight'), 150);
-  }, 200); // Reducido de 1500ms a 200ms para mayor frecuencia
-}
-
-// Función para modo turbo (extremadamente rápido)
-function startTurboBot() {
-  if (isRunning) stopBot();
-  
-  console.log('NotHereBot: ¡MODO TURBO ACTIVADO!');
-  
-  const canvas = getGameCanvas();
-  if (!canvas) {
-    console.error('NotHereBot: No se encontró el canvas del juego');
-    return;
-  }
-  
-  // Click en el canvas para asegurar que tiene foco
-  canvas.click();
-  
-  isRunning = true;
-  
-  // Secuencias de teclas muy rápidas
-  intervalId = setInterval(() => {
-    // Presionar múltiples teclas en secuencia muy rápida
-    ['ArrowUp', 'ArrowRight', 'ArrowUp', 'ArrowRight'].forEach((key, index) => {
-      setTimeout(() => pressKey(key, key), index * 20);
-    });
-  }, 100); // Ciclo extremadamente rápido
+    // Para direcciones diagonales, ciclo de alta velocidad
+    if (keys && keys.length > 1) {
+      // Ejecutar varias veces para maximizar velocidad
+      for (let i = 0; i < 3; i++) {
+        setTimeout(() => moveInDirection(direction), i * 15);
+      }
+    } else {
+      // Para direcciones cardinales, presionar normalmente
+      moveInDirection(direction);
+    }
+  }, intervalTime);
 }
 
 // Función para detener el bot
@@ -105,42 +166,93 @@ function stopBot() {
   clearInterval(intervalId);
   intervalId = null;
   isRunning = false;
+  // Mantener la última dirección seleccionada
 }
 
 // Comando para iniciar/detener el bot desde la consola
 window.NotHereBot = {
-  start: startBot,
   stop: stopBot,
-  toggle: function() {
-    isRunning ? stopBot() : startBot();
-  },
-  turbo: startTurboBot // Nuevo modo turbo
+  // Comandos para mover en direcciones específicas
+  moveUp: function() { startDirectionalMovement(DIRECTIONS.UP); },
+  moveDown: function() { startDirectionalMovement(DIRECTIONS.DOWN); },
+  moveLeft: function() { startDirectionalMovement(DIRECTIONS.LEFT); },
+  moveRight: function() { startDirectionalMovement(DIRECTIONS.RIGHT); },
+  moveUpLeft: function() { startDirectionalMovement(DIRECTIONS.UP_LEFT); },
+  moveUpRight: function() { startDirectionalMovement(DIRECTIONS.UP_RIGHT); },
+  moveDownLeft: function() { startDirectionalMovement(DIRECTIONS.DOWN_LEFT); },
+  moveDownRight: function() { startDirectionalMovement(DIRECTIONS.DOWN_RIGHT); },
+  getStatus: function() {
+    return {
+      isRunning,
+      currentDirection
+    };
+  }
 };
 
 // Escuchar mensajes del background script o popup
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  // Para activar/desactivar el bot
-  if (message.action === 'toggle') {
-    window.NotHereBot.toggle();
-    sendResponse({ success: true, isRunning });
-    return true; // Indica que se enviará una respuesta asíncrona
+  // Para detener explícitamente
+  if (message.action === 'stop') {
+    window.NotHereBot.stop();
+    sendResponse({ success: true, isRunning: false, currentDirection: null });
+    return true;
   }
   
-  // Para activar modo turbo
-  if (message.action === 'turbo') {
-    window.NotHereBot.turbo();
-    sendResponse({ success: true, isRunning: true });
+  // Para mover en una dirección específica
+  if (message.action === 'move' && message.direction) {
+    const direction = message.direction;
+    
+    // Manejar correctamente las direcciones
+    if (direction === 'stop') {
+      stopBot();
+      sendResponse({ success: true, isRunning: false, currentDirection: null });
+    } else {
+      // Convertir el ID del botón a la constante de dirección correspondiente
+      let targetDirection;
+      
+      // Mapeo directo entre IDs de botones y constantes de dirección
+      switch (direction) {
+        case 'up': targetDirection = DIRECTIONS.UP; break;
+        case 'down': targetDirection = DIRECTIONS.DOWN; break;
+        case 'left': targetDirection = DIRECTIONS.LEFT; break;
+        case 'right': targetDirection = DIRECTIONS.RIGHT; break;
+        case 'upLeft': targetDirection = DIRECTIONS.UP_LEFT; break;
+        case 'upRight': targetDirection = DIRECTIONS.UP_RIGHT; break;
+        case 'downLeft': targetDirection = DIRECTIONS.DOWN_LEFT; break;
+        case 'downRight': targetDirection = DIRECTIONS.DOWN_RIGHT; break;
+        default: targetDirection = null;
+      }
+      
+      if (targetDirection) {
+        console.log(`NotHereBot: Moviendo en dirección: ${targetDirection}`);
+        startDirectionalMovement(targetDirection);
+        sendResponse({ 
+          success: true, 
+          isRunning: true, 
+          currentDirection: targetDirection 
+        });
+      } else {
+        console.error(`NotHereBot: Dirección no reconocida: ${direction}`);
+        sendResponse({ 
+          success: false, 
+          error: 'Dirección no válida' 
+        });
+      }
+    }
     return true;
   }
   
   // Para obtener el estado actual del bot
   if (message.action === 'getStatus') {
-    sendResponse({ isRunning });
+    sendResponse({ 
+      isRunning, 
+      currentDirection 
+    });
     return true;
   }
 });
 
 // Esperar a que el juego cargue completamente
 setTimeout(() => {
-  console.log('NotHereBot: Listo para usar. Para velocidad máxima usa NotHereBot.turbo() en la consola');
+  console.log('NotHereBot: Listo para usar. Presiona cualquier dirección para comenzar a moverte.');
 }, 2000);

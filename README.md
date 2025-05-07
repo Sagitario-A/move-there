@@ -9,10 +9,9 @@ Una extensión para Chrome/Edge que automatiza el movimiento en el juego web [NO
 ## ✨ Características
 
 - **Automatización inteligente**: Envía eventos de teclado directamente al elemento canvas
-- **Dos modos de velocidad**: 
-  - Normal: Movimiento automatizado a velocidad moderada
-  - Turbo: Máxima velocidad para un avance rápido
-- **Interfaz sencilla**: Control desde popup o consola del navegador
+- **Alto rendimiento**: Movimiento automatizado a máxima velocidad para todas las direcciones
+- **Movimiento diagonal fluido**: Las direcciones diagonales alternan rápidamente entre sus teclas componentes
+- **Interfaz sencilla**: Control intuitivo con botones de dirección
 - **Código abierto**: Personaliza la extensión según tus necesidades
 
 ## 📥 Instalación
@@ -31,27 +30,28 @@ Una extensión para Chrome/Edge que automatiza el movimiento en el juego web [NO
 
 1. Visita el [juego NOT HERE, THERE](https://demo.nothere.life/demo/index.html)
 2. Haz clic en el icono de la extensión para mostrar el popup
-3. Opciones disponibles:
-   - **Iniciar Bot**: Comienza el movimiento automático a velocidad normal
-   - **Modo Turbo**: Activa el movimiento a máxima velocidad
-   - **Detener**: Para el bot cuando esté activo
+3. Selecciona una dirección de movimiento:
+   - **Direcciones cardinales**: Arriba, Abajo, Izquierda, Derecha
+   - **Diagonales**: Noreste (NE), Noroeste (NO), Sureste (SE), Suroeste (SO)
+4. Para detener el movimiento, haz clic en el botón de pausa central que aparece
 
 ### Control desde consola
 
 También puedes controlar el bot desde la consola del navegador:
 
 ```javascript
-// Iniciar a velocidad normal
-NotHereBot.start()
-
-// Iniciar a máxima velocidad
-NotHereBot.turbo()
+// Mover en diferentes direcciones
+NotHereBot.moveUp()
+NotHereBot.moveDown()
+NotHereBot.moveLeft()
+NotHereBot.moveRight()
+NotHereBot.moveUpLeft()
+NotHereBot.moveUpRight()
+NotHereBot.moveDownLeft()
+NotHereBot.moveDownRight()
 
 // Detener el bot
 NotHereBot.stop()
-
-// Alternar entre iniciar/detener
-NotHereBot.toggle()
 ```
 
 ## 🛠️ Estructura del proyecto
@@ -72,7 +72,7 @@ NotHereBot/
 
 - La extensión utiliza `KeyboardEvent` para simular pulsaciones de teclas
 - Se incluyen propiedades como `bubbles`, `cancelable` y `view: window` para asegurar que el juego los reconozca
-- Modo turbo envía múltiples teclas en secuencia muy rápida para máximo rendimiento
+- Las diagonales alternan rápidamente entre sus teclas componentes para emular movimiento diagonal fluido
 
 ## 🤝 Contribuciones
 
@@ -90,4 +90,5 @@ Este proyecto está disponible como código abierto bajo los términos de la lic
 ## 📝 Historial de versiones
 
 - **v1.0.0** - Versión inicial con movimiento automático
-- **v1.1.0** - Añadido modo turbo y mejoras de velocidad 
+- **v1.1.0** - Mejoras de velocidad y soporte para diagonales
+- **v2.0.0** - Simplificación de la interfaz e integración de alto rendimiento por defecto 

@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "NotHere AutoMover",
-    "version": "1.0",
+    "version": "2.0.0",
     "description": "Automatiza movimiento en el juego NO THERE, THERE",
     "permissions": ["scripting", "activeTab"],
     "host_permissions": ["https://demo.nothere.life/*"],

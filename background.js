@@ -1,10 +1,7 @@
 // Manejar el clic en el icono de la extensión
 chrome.action.onClicked.addListener(async (tab) => {
   // Verificar que estamos en la página correcta
-  if (tab.url.includes('demo.nothere.life')) {
-    // Enviar mensaje al content script para activar/desactivar el bot
-    await chrome.tabs.sendMessage(tab.id, { action: 'toggle' });
-  } else {
+  if (!tab.url.includes('demo.nothere.life')) {
     // Alertar al usuario que está en una página incorrecta
     await chrome.scripting.executeScript({
       target: { tabId: tab.id },
@@ -13,4 +10,9 @@ chrome.action.onClicked.addListener(async (tab) => {
       }
     });
   }
+  // No se requiere ninguna acción adicional aquí, 
+  // ya que el popup se abrirá automáticamente al hacer clic en el icono
 });
+
+// No necesitamos hacer nada más en el background script,
+// el popup se encargará de todo cuando se abra.
