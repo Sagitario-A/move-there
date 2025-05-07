@@ -1,0 +1,32 @@
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos temporales
+*.tmp
+*.bak
+*.swp
+*~
+
+# Directorio node_modules (si decides usar npm en el futuro)
+node_modules/
+
+# Archivos de entorno local
+.env
+.env.local
+
+# Carpetas de distribución
+dist/
+build/
+
+# Archivos de iconos generados (opcional, puedes comentar estas líneas si deseas incluirlos)
+# icon16.png
+# icon48.png
+# icon128.png
+
+# Archivos de configuración de IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace 

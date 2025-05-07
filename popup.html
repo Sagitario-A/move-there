@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      width: 200px;
+      padding: 10px;
+      font-family: Arial, sans-serif;
+    }
+    button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      cursor: pointer;
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #3367d6;
+    }
+    .status {
+      text-align: center;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    .info {
+      font-size: 12px;
+      color: #666;
+      margin-top: 10px;
+    }
+    .turbo {
+      background-color: #f44336;
+    }
+    .turbo:hover {
+      background-color: #d32f2f;
+    }
+  </style>
+</head>
+<body>
+  <div class="status" id="statusText">Estado: Desactivado</div>
+  <button id="toggleButton">Iniciar Bot</button>
+  <button id="turboButton" class="turbo">¡MODO TURBO!</button>
+  <div class="info">
+    Esta extensión automatiza el movimiento en el juego NOT HERE, THERE.
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html> 

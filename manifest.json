@@ -1,0 +1,28 @@
+{
+    "manifest_version": 3,
+    "name": "NotHere AutoMover",
+    "version": "1.0",
+    "description": "Automatiza movimiento en el juego NO THERE, THERE",
+    "permissions": ["scripting", "activeTab"],
+    "host_permissions": ["https://demo.nothere.life/*"],
+    "content_scripts": [
+      {
+        "matches": ["https://demo.nothere.life/*"],
+        "js": ["content.js"],
+        "run_at": "document_idle"
+      }
+    ],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "action": {
+      "default_title": "AutoMover",
+      "default_popup": "popup.html"
+    },
+    "icons": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  }
+  
